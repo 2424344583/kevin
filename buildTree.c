@@ -38,16 +38,16 @@ void makeChildren( Node *parent ) {
 }
 void growTree(Node *parent){
 	int i;
-	if(!parent){
+	if(parent->child[0] == NULL){
+		makeChildren(parent);
 		return;
 	}
-	for(i = 0; i < 4; i++){
-		growTree(parent->child[i]);
-}
-	if(parent->child[0] == NULL && parent->child[1] == NULL && parent->child[2] == NULL && parent->child[3] == NULL){
-		makeChildren(parent);
+	else{
+		for(i=0;i<4;i++){
+			growTree(parent->child[i]);
+		}
 	}
-	return;
+	
 }
 void removeChildren(Node *parent){
 	int i;
@@ -114,7 +114,7 @@ void findNode(Node *node){
 		else{
 			for(i=0;i<4;++i){
 				findNode(node->child[i]);
-			}
+			} 
 		}
 	}
 	return;  
