@@ -1,0 +1,86 @@
+#include<stdio.h> 
+#include<string.h>
+#include<conio.h>
+void Login();
+void interface();
+int j,t;
+int main()
+{
+	Login();
+	interface();
+	return 0;
+}
+
+void Login(){
+	int i=0;
+	int k;
+	char ID[10]={0};
+	char password[6]={0};
+	printf("Please choose your identity\n1 is student,2 is manager\n");
+	scanf("%d",&j);
+	printf("Please enter ID\n");
+	scanf("%s",&ID);
+	printf("Please enter password\n");
+	while (i<3){
+		for(k=0;k<6;k++){
+			password[k]=getch();
+			printf("*");
+		}
+		password[k]='\0';
+		/*scanf("%s",&password) ;*/
+		printf("\n");
+		if(strcmp(password,"110242")==0){
+		printf("password is correct\n");
+		break;
+		}
+		if(strcmp(password,"110243")==0){
+		printf("password is correct\n");
+		break;
+		} 
+			else{
+				i++;
+				t++;
+				if(i!=3){
+				printf("Password is error,Please enter again\n");
+				}
+			}		
+	}
+	if(i==3){
+		printf("out\n");
+	}
+	if(j==1&&i!=3){
+		printf("Welcome Student System\n");
+	}
+	if(j==2&&i!=3){
+		printf("Welcome Manager System\n");
+	}
+}
+void interface(){
+	int i;
+	if(j==1&&t!=3){
+		printf("Please choose what do you want to do\n1 is borrow book\n2 is return book\n3 is browse information of books\n4 is out system\n");
+		scanf("%d",&i);
+		if(i==1){
+			printf("borrow\n");
+		}
+		if(i==2){
+			printf("return\n");
+		}
+		if(i==3){
+			printf("browse\n");
+		}
+	}
+	if(j==2&&t!=3){
+		printf("Please choose what do you want to do\n1 is check information\n2 is add book\n3 is delete book\n4 is out system\n");
+		scanf("%d",&i);
+		if(i==1){
+			printf("borrow\n");
+		}
+		if(i==2){
+			printf("return\n");
+		}
+		if(i==3){
+			printf("browse\n");
+		}
+	}
+}
