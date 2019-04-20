@@ -1,0 +1,10 @@
+void read(){
+	FILE *fp=fopen("try.txt","r");
+	books a[110];
+	int i=0;
+	while(fscanf(fp,"%d%s",a[i].num,a[i].name)!=EOF)
+    {
+         printf("%d\t%s\t\n",a[i].num,a[i].name); 
+         i++;
+    }  
+    fclose(fp);
