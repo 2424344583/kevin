@@ -1,0 +1,12 @@
+void add(){
+	FILE *fp;
+	fp=fopen("try.txt","a");
+	printf("Please enter the num of book and the name of book and add '#'\n");
+	s=getchar();
+	while(s!='#'){
+		fputc(s,fp);
+		s=getchar();
+	}
+	fclose(fp);
+	
+}
