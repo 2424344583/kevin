@@ -1,0 +1,20 @@
+void borrow(){
+    FILE *fin,*ftp;
+    int s;
+    int i=0;
+    fin=fopen("try.txt","r");
+    ftp=fopen("tmp.txt","w");
+    printf("please enter the num of book\n");
+    scanf("%d",&s);
+    while(fscanf(fin,"%d%s",books[i].num,books[i].name)!=EOF){
+    	printf("%d\t%s\t\n",books[i].num,books[i].name);
+          if(books[i].num!=s){
+              fputs(books,ftp);
+			  }
+			  i++;
+		}
+    fclose(fin);
+    fclose(ftp);
+    remove("try.txt");
+    rename("tmp.txt","try.txt");	
+}
