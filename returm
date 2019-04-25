@@ -1,0 +1,49 @@
+void returnbook(struct user *userp){	
+   struct book *p;
+   char bookname[100];	
+   int count = userp->bookcount;	
+   int exist;	
+   int flag; 	
+   system("cls");	
+   p = bookhead;	
+   while (count--){	
+   	 printf("booklist:\n");		
+	 printf("%s\n", userp->booklist[count]);
+	}	
+   printf("\n\n\n\n\n");	
+   printf("***************************");	
+   printf("\n输入你需要归还的书籍名称: "); 	
+   getchar();	
+   while (gets(bookname)){	
+   	 exist = 0;	
+		for (int i = 0; i < userp->bookcount; i++){		
+			if (strcmp(bookname, userp->booklist[i]) == 0){			
+				flag = i;			
+				exist = 1;				
+				break;			
+			}		
+		}		
+		if (!exist)	{			
+		printf("你借阅的书籍中不存在此书籍...\n");			
+		printf("请重新输入你需要归还的书籍名称: ");	
+		}		
+		else  break;
+	}	
+	printf("**************************");	
+	while (p != NULL){	
+		if (strcmp(p->bookname, bookname) == 0)	{		
+			p->count++;			
+			break;		
+		}		
+	    p = p->next;	
+    } 	
+    for (int i = flag; i < userp->bookcount - 1; i++){	
+		strcpy(userp->booklist[i], userp->booklist[i + 1]);	
+		}	
+	userp->bookcount--;	
+	writefile(0);	
+	writefile(1);	
+	printf("\n%s归还成功...", bookname);	
+	printf("3秒后自动跳转回用户界面...");	
+	Sleep(3000);
+}
