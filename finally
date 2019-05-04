@@ -1,0 +1,622 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<conio.h>
+#include<windows.h>
+struct user{
+	int bookcount;
+	char username[100];
+	char password[10];	
+	char booklist[10][20];	
+	struct user *next;
+	};
+struct book{
+	char bookname[100];
+	int count;
+	struct book *next;
+    };
+struct user *head = NULL, *end = NULL;
+struct book *bookhead = NULL, *bookend = NULL;
+
+void userlogin();
+void userregister();
+void readuserfile();
+void adminface(); 
+void userface(struct user *p);
+void borrowbook(struct user *userp);
+void returnbook(struct user *userp);
+int check(char *name);
+void addbook();
+void deletebook();
+void searchuser(); 
+void writefile(int flag);
+void readbookfile();
+void adminlogin();
+void face();
+int usercount,bookcount;
+
+int main(){
+	head=(struct user *)malloc(sizeof(struct user));
+	bookhead=(struct book *)malloc(sizeof(struct book));
+	FILE *fp;
+	
+	fp = fopen("user.txt", "a+");	
+	usercount = fread(head, sizeof(struct user), 1, fp);	
+	fclose(fp);	
+	end = head;	
+	readuserfile();
+	
+	fp = fopen("book.txt", "a+");
+	bookcount = fread(bookhead, sizeof(struct book), 1, fp);
+	fclose(fp);
+	bookend = bookhead;
+	readbookfile();
+		
+	face();
+} 
+void face(){
+    int i;	
+	int end = 0; 	
+	while (1){		
+		system("cls");		
+		printf("\n\n\n\n\n\n\n");		
+		printf("*******************");		
+		printf("\nLibrary System\n");		
+		printf("1.userlogin\n");		
+		printf("2.adminlogin\n");		
+		printf("3.userregister\n");				
+		printf("0.out\n");		
+		printf("*******************");		
+		printf("\n\n\n\n\n\n\n");		
+		printf("What do you want to do :");		
+		scanf("%d", &i);
+		getchar();			
+		switch (i){		
+		case 1:			
+		userlogin();			
+		break;		
+		case 2:			
+		adminlogin();		
+		break;		
+		case 3:			
+		userregister();		
+		break;				
+		case 0:			
+		end = 1;			
+		break;		
+		default:
+		printf("error!\n");
+		}		
+	    if (i == 1)break;	
+	  }
+	}
+
+void userlogin(){
+	struct user *p;	
+	char username[100];	
+	char password[100];	
+	int exist = 0;
+	p = head;	
+	system("cls");	
+	printf("\n\n\n\n");		
+	printf("\nEnter your User Information: \n");	
+	printf("username: ");
+	gets(username);
+	printf("userpassword: ");
+	gets(password); 		
+	printf("\n\n\n\n");
+	while (p != NULL){
+		if (strcmp(p->username, username) == 0){			
+			exist = 1;			
+			while(strcmp(p->password, password) != 0){				
+			printf("Password error, Please re-enter\n");				
+			printf("userpassword: ");				
+			gets(password);			
+	    	}	 
+		printf("User %s log into successfully!\n", p->username);
+		printf("Automatically jump to the user interface after 3 seconds...");
+		Sleep(3000);			
+		userface(p);
+		}		
+		p = p->next;	
+	}
+	if (!exist)	{		
+		printf("This user name does not exist. Please register first...\n");		
+		printf("Automatically jump to the main interface after 3 seconds...");		
+		Sleep(3000);
+	  }
+	}
+	
+void userregister(){
+	struct user *p;
+	char username[110];	
+	char password[110];	
+	FILE *fp; 	
+	system("cls");	
+	if (usercount == 0){
+	printf("username: ");		
+	while (gets(username)){		
+		if (strlen(username) < 11 && !check(username))	break;	
+		else if (check(username)){			
+			printf("The user name already exists!\n");			
+			printf("username: ");		
+			}		
+		else{			
+			printf("error\n");			
+			printf("username: ");		
+			}
+		}		
+		strcpy(head->username, username);		
+		printf("userpassword: ");		
+		while (gets(password)){		
+			if (strlen(password) < 7)	
+						break;	
+			else			
+				printf("error\n");	
+				}	
+		strcpy(head->password, password);		
+		head->bookcount = 0;		
+		end = head;		
+		end->next = NULL;
+		}
+	else{		
+		printf("username: ");	
+		while (gets(username)){
+		p = (struct user *)malloc(sizeof(struct user));			
+			if (strlen(username) < 11 && !check(username))			
+				break;		
+			else if (check(username)){				
+			printf("The user name already exists!\n");				
+			printf("username: ");		
+			}			
+			else{				
+			printf("error\n");
+			printf("username: ");			
+			}	
+		}		
+		strcpy(p->username, username);		
+		printf("userpassword: ");		
+		while (gets(password)){			
+		if (strlen(password) < 7)				
+		       break;			
+		else	printf("error\n");		
+		}		
+		strcpy(p->password, password);		
+		p->bookcount = 0;		
+		end->next = p;		
+		end = p;		
+		end->next = NULL;	
+	}	
+	usercount++;  	
+	fp = fopen("user.txt", "w");	
+	p = head;	
+	while (p != NULL){		
+	fwrite(p, sizeof(struct user), 1, fp);		
+	p = p->next;	
+	}	
+	fclose(fp); 	
+	printf("User %s was created successfully\n", end->username);	
+	printf("Automatically return to the main interface after 3 seconds....");
+	Sleep(3000);	
+	}
+
+
+	
+int check(char *name){			
+		struct user *p;		
+		p = head;		
+		while (p != NULL && usercount != 0)		
+		{			
+		if (strcmp(name, p->username) == 0)	
+		    return 1;			
+		p = p->next;		
+		}		
+	return 0;
+	}
+ 
+void userface(struct user *p){
+	int i;	
+	int end = 0; 	
+	while (1){		
+		system("cls");		
+		printf("\n\n\n\n\n\n\n");		
+		printf("***********************");		
+		printf("\nLibrary user function system\n");		
+		printf("1.Borrow books\n");		
+		printf("2.Return the books\n");				
+		printf("0.Out\n");		
+		printf("************************");		
+		printf("\n\n\n\n\n\n\n");		
+		printf("Enter what you need to do: ");		
+		scanf("%d", &i);
+		getchar();
+		switch (i){		
+			case 1:			
+			borrowbook(p);			
+			break;		
+			case 2:			
+			returnbook(p);			
+			break;							
+			case 0:			
+			end = 1;			
+			break;		
+			default:			
+			printf("Error!\n");
+	  }		
+	if (end == 1)			
+	break;	
+	}
+}
+
+void adminlogin(){
+	int i=0; 
+	int k;
+	char ID[10]={0};
+	char password[6]={0};
+	system("cls");
+	printf("\n\n\n\n\n\n\n");	
+	printf("Please enter ID\n");
+	scanf("%s",&ID);
+	printf("Please enter password\n");
+	while (i<3){
+		for(k=0;k<6;k++){
+			password[k]=getch();
+			printf("*");
+		}
+		password[k]='\0';
+		printf("\n");
+		if(strcmp(password,"110243")==0){
+		printf("password is correct\n");
+		printf("Automatically jump to the administrator interface after 3 seconds...");		
+		Sleep(3000);
+        adminface();
+		break;
+		} 
+			else{
+				i++;
+				if(i!=3){
+				printf("Password is error,Please enter again\n");
+				}
+			}		
+	}
+}
+
+void adminface(){
+	int i;	
+	int end = 0; 	
+	while (1){		
+		system("cls");		
+		printf("\n\n\n\n\n\n\n");		
+		printf("**********************");		
+		printf("\nLibrarian functional system\n");		
+		printf("1.Add book information\n");		
+		printf("2.Delete book information\n");			
+		printf("3.Search user information\n");		
+		printf("0.Out\n");		
+		printf("**********************");		
+		printf("\n\n\n\n\n\n\n");		
+		printf("Enter what you need to do: ");		
+		scanf("%d", &i);				
+		switch (i){		
+			case 1:
+			addbook();			
+			break;		
+			case 2:			
+			deletebook();			
+			break;		
+			case 3:			
+			searchuser();										
+			break;		
+			case 0:			
+			end = 1;			
+			break;		
+			default:			
+			printf("Error!\n");		
+	   }		
+	if (end == 1)break;	
+    } 
+}
+
+void borrowbook(struct user *userp){
+	struct book *p;	
+	char bookname[100];	
+	int exist = 0; 	
+	system("cls");	
+	p = bookhead;	
+	while (p != NULL)	{		
+		printf("bookname: %10s\tbookcount: %3d\n", p->bookname, p->count);	
+		p = p->next;
+	}	
+	printf("Enter the name of the book you want to borrow: ");	
+	gets(bookname); 	
+	p = bookhead;	
+	while (p != NULL){	
+		if (strcmp(bookname, p->bookname) == 0)	{	
+			if (p->count == 0)		
+				printf("This book has no margin...");			
+			else{				
+				p->count -= 1;				
+				userp->bookcount++;				
+				strcpy(userp->booklist[userp->bookcount - 1], p->bookname);	
+				exist = 1;			
+				writefile(0);				
+				writefile(1);								
+				break;		
+			}
+					
+		}		
+			p = p->next;	
+	} 	
+	if (exist == 0){
+		printf("It doesn't exist!\n");
+		printf("Return to the user interface after 3 seconds...");	
+		Sleep(3000);
+	}	   
+	else{	
+		printf(" %s Borrow successfully\n", p->bookname);	
+		printf("Return to the user interface after 3 seconds...");	
+		Sleep(3000);
+		} 
+}
+
+void returnbook(struct user *userp){	
+   struct book *p;
+   char bookname[100];	
+   int count = userp->bookcount;	
+   int exist;	
+   int flag; 	
+   system("cls");	
+   p = bookhead;	
+   while (count--){	
+   	 printf("booklist:\n");		
+	 printf("%s\n", userp->booklist[count]);
+	}	
+   printf("\n\n");	
+   printf("***************************");	
+   printf("\nEnter the name of the book you want to return: "); 	
+   getchar();	
+   while (gets(bookname)){	
+   	 exist = 0;	
+		for (int i = 0; i < userp->bookcount; i++){		
+			if (strcmp(bookname, userp->booklist[i]) == 0){			
+				flag = i;			
+				exist = 1;				
+				break;			
+			}		
+		}		
+		if (!exist)	{			
+		printf("This book does not exist in the books you borrow...\n");			
+		printf("Please re - enter the name of the book you want to return: ");	
+		}		
+		else  break;
+	}	
+	printf("**************************");	
+	while (p != NULL){	
+		if (strcmp(p->bookname, bookname) == 0)	{		
+			p->count++;			
+			break;		
+		}		
+	    p = p->next;	
+    } 	
+    for (int i = flag; i < userp->bookcount - 1; i++){	
+		strcpy(userp->booklist[i], userp->booklist[i + 1]);	
+		}	
+	userp->bookcount--;	
+	writefile(0);	
+	writefile(1);	
+	printf("\n %s Return  successfully\n", bookname);	
+	printf("Automatically jump back to the user interface after 3 seconds...");	
+	Sleep(3000);
+}
+	
+void addbook(){
+	struct book *p;	
+	char bookname[100];	
+	FILE *fp; 	
+	system("cls");	
+	if (bookcount == 0)	{	
+		printf("Enter the title of the new book: ");
+		scanf("%s",&bookname);		
+		while (1){			
+			if (strlen(bookname) > 10)		
+			printf("error\n");			
+			else  break;		
+			}							
+		printf("The number of books: ");		
+		scanf("%d", &bookhead->count);
+		strcpy(bookhead->bookname, bookname); 		
+		bookend = bookhead;		
+		bookend->next = NULL;
+		}	
+	else{
+		printf("Enter the title of the new book: ");
+		scanf("%s",&bookname);			
+		while (1){			
+			if (strlen(bookname) > 10)				
+			printf("error\n");			
+			else  break;		
+			}		
+		int i = 0;		
+		p = bookhead;		
+		while (p != NULL){		
+			if (strcmp(bookname, p->bookname) == 0){		
+				i = 1;				
+				break;			
+				}			
+			p = p->next;		
+		    }		
+		if (i == 1){		
+			int count; 			
+			printf("Enter the number of: ");			
+			scanf("%d", &count);			
+			p->count += count;		
+			}		
+		else{			
+		p = (struct book *)malloc(sizeof(struct book)); 											
+        printf("The number of books: ");			
+		scanf("%d", &p->count); 
+		strcpy(p->bookname, bookname);			
+		bookend->next = p;			
+		bookend = p;			
+		bookend->next = NULL;		
+		}	
+	}
+	
+	bookcount++; 	
+	p = bookhead;	
+	fp = fopen("book.txt", "w");	
+	while (p != NULL){	
+		fwrite(p, sizeof(struct book), 1, fp);		
+		p = p->next;	
+		}	
+	fclose(fp); 		
+	printf("Books added successfully\n");	
+	printf("Automatically jump to the administrator interface after 3 seconds....\n");	
+	Sleep(3000);
+}
+
+void deletebook(){
+	struct book *bookp;	
+	char bookname[100];	
+	int i = 0; 	
+	bookp = bookhead;
+	
+	system("cls");
+	getchar();	
+	printf("Enter the name of the book you want to delete: ");	
+	while (gets(bookname)){	
+		while (bookp != NULL){	
+			if (strcmp(bookname, bookp->bookname) == 0)	{		
+				i = 1;				
+				break;			
+			}			
+		bookp = bookp->next;		
+		}			
+	if (!i){		
+		printf("There is no book with this name...\n");			
+		printf("please enter again: ");		
+		}		
+	else  break;	
+ 	}
+ 	bookp = bookhead;	
+	if (strcmp(bookhead->bookname,bookname) == 0)		
+		bookhead = bookhead->next;	
+		while (bookp->next != NULL)	{		
+			if (strcmp(bookp->next->bookname, bookname) == 0){		
+				bookp->next = bookp->next->next;			
+				break;		
+			}		
+				bookp = bookp->next;
+		}
+	writefile(1);
+	printf("Book deleted successfully\n");	
+	printf("Automatically jump to the administrator interface after 3 seconds....\n");	
+	Sleep(3000);
+}
+
+void searchuser(){
+	struct user *p;	
+	char username[100];	
+	int flag; 	
+	p = head;
+		
+	system("cls");
+	getchar();	
+	printf("\n\n\n\n\n\n\n");	
+	printf("*************************");	
+	printf("\nEnter the user name you want to search!\n");	
+	printf("username: ");	
+	gets(username);	
+	while (p != NULL){		
+		if (strcmp(p->username, username) == 0){		
+			flag = 1;			
+			break;		
+			}		
+		p = p->next;	
+	}	
+	if (flag == 0){	
+		system("cls");	
+		printf("The user information does not exist\n");		
+		printf("Automatically jump to the administrator interface after 3 seconds...\n");		
+		Sleep(3000);		
+		return;	
+	}	
+	else{	
+		int n; 		
+		while (1){	
+			system("cls");			
+			printf("\n\n\n\n\n\n\n");			
+			printf("*********************");			
+			printf("\nPersonal information of user %s\n", p->username);			
+			printf("*********************");			
+			printf("\nusername: ");			
+			puts(p->username);			
+			printf("userpassword: ");			
+			puts(p->password);			
+			printf("the num of books: %d\n", p->bookcount);		
+			if (p->bookcount != 0){			
+				printf("booklist: \n");			
+					for (int i = 0; i < p->bookcount; i++)			
+							puts(p->booklist[i]);			
+				}
+			printf("Enter 0 to return to the administrator interface!\n");			
+			scanf("%d", &n);			
+			if (n == 0)				
+			break;		
+		}	
+	}
+}
+
+void writefile(int flag){
+	FILE *fp;	
+	struct user *userp;		
+	struct book *bookp; 	
+	userp = head;	
+	bookp = bookhead; 	
+	if (flag == 0){	
+		fp = fopen("user.txt", "w");		
+		while (userp != NULL){		
+			fwrite(userp, sizeof(struct user), 1, fp);			
+			userp = userp->next;	
+			}	
+		}	
+    else if(flag==1){	
+		fp = fopen("book.txt", "w");	
+		while (bookp != NULL)	
+			{			
+			fwrite(bookp, sizeof(struct book), 1, fp);			
+			bookp = bookp->next;	
+		}	
+	}	
+	fclose(fp);
+}
+
+void readuserfile(){	
+	struct user *p;	
+    FILE *fp; 	
+	p = head;	
+	fp = fopen("user.txt", "a+");	
+	while (fread(p,sizeof(struct user),1,fp)){	
+		if (p->next != NULL){		
+	   	p = (struct user *)malloc(sizeof(struct user)); 	
+		   	end->next = p;	
+			end = p;		
+			end->next = NULL;		
+			}
+	}
+} 
+
+void readbookfile(){
+	struct book *p;	
+	FILE *fp; 	
+	p = bookhead;	
+	fp = fopen("book.txt", "a+");	
+	while (fread(p, sizeof(struct book), 1, fp)){	
+		if (p->next != NULL){		
+			p = (struct book *)malloc(sizeof(struct book)); 			
+			bookend->next = p;			
+			bookend = p;			
+			bookend->next = NULL;	
+		}	
+	}
+}
